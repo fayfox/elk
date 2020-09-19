@@ -1,0 +1,40 @@
+node.name: es01
+cluster.name: docker-cluster
+# In order to join a cluster, a node needs to know the hostname or IP address of at least some of the other nodes in the cluster.
+# This setting provides the initial list of addresses this node will try to contact. Accepts IP addresses or hostnames.
+# If a hostname lookup resolves to multiple IP addresses then each IP address will be used for discovery.
+# Round robin DNS — returning a different IP from a list on each lookup — can be used for discovery;
+# non- existent IP addresses will throw exceptions and cause another DNS lookup on the next round of pinging (subject to JVM DNS caching).
+#
+# Defaults to ["127.0.0.1", "[::1]"].
+# 为了加入集群，该节点需要知道集群中至少一个其它节点
+discovery.seed_hosts:
+  - "es02"
+
+# When you start a brand new Elasticsearch cluster for the very first time, there is a cluster bootstrapping step,
+# which determines the set of master-eligible nodes whose votes are counted in the very first election.
+# In development mode, with no discovery settings configured, this step is automatically performed by the nodes themselves.
+# As this auto-bootstrapping is inherently unsafe, when you start a brand new cluster in production mode,
+# you must explicitly list the master-eligible nodes whose votes should be counted in the very first election.
+# This list is set using the cluster.initial_master_nodes setting.
+# 指定参与主节点选举的主机
+cluster.initial_master_nodes:
+  - "es01"
+
+# This specifies which network interface(s) a node should bind to in order to listen for incoming requests.
+# A node can bind to multiple interfaces, e.g. two network cards, or a site-local address and a local address. Defaults to network.host.
+network.bind_host: 0.0.0.0
+
+# The publish host is the single interface that the node advertises to other nodes in the cluster,
+# so that those nodes can connect to it. Currently an Elasticsearch node may be bound to multiple addresses,
+# but only publishes one. If not specified, this defaults to the “best” address from network.host,
+# sorted by IPv4/IPv6 stack preference, then by reachability.
+# If you set a network.host that results in multiple bind addresses yet rely on a specific address for node-to-node communication,
+# you should explicitly set network.publish_host.
+# 用于其它节点与该节点进行通信
+network.publish_host: es01
+
+#http.port: 9200
+#transport.tcp.port: 9300
+#node.master: true
+#node.data: true

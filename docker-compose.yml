@@ -1,0 +1,57 @@
+version: '3'
+services:
+  es01:
+    # 在官方镜像基础上，安装了ik和pinyin分词器，Dockerfile文件见docker-images目录
+    image: registry.cn-hangzhou.aliyuncs.com/fayfox/es:7.9.0-ik-pinyin
+    volumes:
+      - ./conf/es01.yml:/usr/share/elasticsearch/config/elasticsearch.yml:ro
+      # 测试而已，不需要把数据目录映射出来
+#      - ./data01:/usr/share/elasticsearch/data
+    environment:
+      # 时区
+      TZ: Asia/Shanghai
+      # 本地测试，限制一下内存占用
+      ES_JAVA_OPTS: -Xms512m -Xmx512m
+    ports:
+      - "9200:9200"
+      - "9300:9300"
+  es02:
+    image: registry.cn-hangzhou.aliyuncs.com/fayfox/es:7.9.0-ik-pinyin
+    volumes:
+      - ./conf/es02.yml:/usr/share/elasticsearch/config/elasticsearch.yml:ro
+#      - ./data02:/usr/share/elasticsearch/data
+    environment:
+      TZ: Asia/Shanghai
+      ES_JAVA_OPTS: -Xms512m -Xmx512m
+    ports:
+      - "9201:9200"
+      - "9301:9300"
+  es03:
+    image: registry.cn-hangzhou.aliyuncs.com/fayfox/es:7.9.0-ik-pinyin
+    volumes:
+      - ./conf/es03.yml:/usr/share/elasticsearch/config/elasticsearch.yml:ro
+#      - ./data03:/usr/share/elasticsearch/data
+    environment:
+      TZ: Asia/Shanghai
+      ES_JAVA_OPTS: -Xms512m -Xmx512m
+    ports:
+      - "9202:9200"
+      - "9302:9300"
+  logstash:
+    # 官方镜像没做改动，因为国外源下不动，推到了自己的阿里云仓库
+    image: registry.cn-hangzhou.aliyuncs.com/fayfox/logstash:7.9.0
+    environment:
+      TZ: Asia/Shanghai
+    volumes:
+        - ./conf/logstash.conf:/opt/logstash/logstash.conf:ro
+    command: -f /opt/logstash/logstash.conf
+    ports:
+      - "4560:4560"
+  kibana:
+    # 官方镜像没做改动，因为国外源下不动，推到了自己的阿里云仓库
+    image: registry.cn-hangzhou.aliyuncs.com/fayfox/kibana:7.9.0
+    environment:
+      ELASTICSEARCH_HOSTS: http://es01:9200
+      TZ: Asia/Shanghai
+    ports:
+      - "5601:5601"
